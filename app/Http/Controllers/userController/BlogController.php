@@ -11,10 +11,6 @@ class BlogController extends Controller
     public function index()
     {
         $blogs = Blog::with('author')->get();
-        $blogs = $blogs->map(function ($blog) {
-            $blog->author = $blog->author;
-            return $blog;
-        });
 
         return response()->json([
             'status' => 200,
