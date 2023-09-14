@@ -13,6 +13,7 @@ class Blog extends Model
         'title',
         'content',
         'author_id',
+        // 'category_id',
     ];
 
     protected $casts = [
@@ -26,6 +27,6 @@ class Blog extends Model
 
     public function categories()
     {
-        return $this->belongsToMany(BlogCategory::class);
+        return $this->belongsToMany(BlogCategory::class, 'blog_blog_category', 'blog_id', 'blog_category_id');
     }
 }

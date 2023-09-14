@@ -3,14 +3,20 @@
 namespace App\Http\Controllers\userController;
 
 use Illuminate\Http\Request;
-use App\Models\Blog;
-use App\Models\BlogCategory;
+use App\Repository\BlogEloquent;
 
 class BlogController extends Controller
 {
-    public function index()
+    protected $blogRepository;
+
+    public function __construct(BlogEloquent $blogRepository)
     {
-        $blogs = Blog::with('author')->get();
+        $this->blogRepository = $blogRepository;
+    }
+
+    public function getAllBlogs()
+    {
+        $blogs = $this->blogRepository->getAllBlogs();
 
         return response()->json([
             'status' => 200,
@@ -19,9 +25,10 @@ class BlogController extends Controller
         ]);
     }
 
-    public function show($id)
+    public function getBlogInfo($id)
     {
-        $blog = Blog::find($id);
+        $blog = $this->blogRepository->getBlogById($id);
+
         return response()->json([
             'status' => 200,
             'message' => 'Blog retrieved successfully',
@@ -29,22 +36,12 @@ class BlogController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function createBlog(Request $request)
     {
-        $blog = new Blog;
-        $blog->author_id = $request->user()->id;
-        $blog->title = $request->title;
-        $blog->content = $request->content;
-        if ($request->has('category_ids')) {
-            foreach ($request->category_ids as $categoryId) {
-                $category = BlogCategory::find($categoryId);
-                if ($category) {
-                    $blog->categories()->attach($category);
-                }
-            }
-        }
+        $userId = auth()->user()->id;
+        $requestData = array_merge($request->all(), ['user_id' => $userId]);
+        $blog = $this->blogRepository->createBlog($requestData);
 
-        $blog->save();
         return response()->json([
             'status' => 200,
             'message' => 'Blog created successfully',
@@ -52,16 +49,10 @@ class BlogController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function updateBlog(Request $request, $id)
     {
-        $blog = Blog::find($id);
-        if ($request->has('title')) {
-            $blog->title = $request->title;
-        }
-        if ($request->has('content')) {
-            $blog->content = $request->content;
-        }
-        $blog->save();
+        $blog = $this->blogRepository->updateBlog($id, $request->all());
+
         return response()->json([
             'status' => 200,
             'message' => 'Blog updated successfully',
@@ -69,14 +60,20 @@ class BlogController extends Controller
         ]);
     }
 
-    public function destroy($id)
+    public function deleteBlog($id)
     {
-        $blog = Blog::find($id);
-        $blog->delete();
-        return response()->json([
-            'status' => 200,
-            'message' => 'Blog deleted successfully',
-            'data' => null
-        ]);
-    }
+       if ($this->blogRepository->deleteBlog($id)) {
+           return response()->json([
+               'status' => 200,
+               'message' => 'Blog deleted successfully',
+               'data' => null
+           ]);
+       } else {
+           return response()->json([
+               'status' => 404,
+               'message' => 'Blog not found',
+               'data' => null
+           ]);
+       }
+   }
 }
