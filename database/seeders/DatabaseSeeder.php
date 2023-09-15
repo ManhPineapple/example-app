@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
+use App\Models\BlogCategory;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,11 +15,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        User::create([
+            'name' => 'ADMIN',
+            'email' => 'manh.tv0911@gmail.com',
+            'role' => 1,
+            'password' => Hash::make('manh.tv0911'),
+        ]);
+        BlogCategory::create([
+            'name' => 'First category',
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        BlogCategory::create([
+            'name' => 'Second category',
+        ]);
     }
 }

@@ -12,7 +12,7 @@ class ProfileController extends Controller
         $user = User::find($request->user()->id);
 
         return response()->json([
-          'status' => 'success',
+          'status' => 200,
           'message' => 'User data retrieved successfully.',
           'data' => $user
       ]);
@@ -28,7 +28,7 @@ class ProfileController extends Controller
         $user->save();
 
         return response()->json([
-            'status' => 'success',
+            'status' => 200,
             'message' => 'User data updated successfully.',
             'data' => $user
         ]);

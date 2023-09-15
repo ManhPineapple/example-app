@@ -51,7 +51,12 @@ class BlogController extends Controller
 
     public function updateBlog(Request $request, $id)
     {
-        $blog = $this->blogRepository->updateBlog($id, $request->all());
+        $blog = $this->blogRepository->updateBlog($id, array_merge($request->all(), ['userId' => $request->user()->id]));
+        if (!$blog) return response()->json([
+            'status' => 400,
+            'message' => "You can't update this blog.",
+            'data' => null
+        ]);
 
         return response()->json([
             'status' => 200,
@@ -60,20 +65,20 @@ class BlogController extends Controller
         ]);
     }
 
-    public function deleteBlog($id)
+    public function deleteBlog(Request $request ,$id)
     {
-       if ($this->blogRepository->deleteBlog($id)) {
-           return response()->json([
-               'status' => 200,
-               'message' => 'Blog deleted successfully',
-               'data' => null
-           ]);
-       } else {
-           return response()->json([
-               'status' => 404,
-               'message' => 'Blog not found',
-               'data' => null
-           ]);
-       }
+        if ($this->blogRepository->deleteBlog($id, $request->user()->id)) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Blog deleted successfully',
+                'data' => null
+            ]);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => "You can't delete this blog.",
+                'data' => null
+            ]);
+        }
    }
 }

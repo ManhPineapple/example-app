@@ -13,7 +13,6 @@ class Blog extends Model
         'title',
         'content',
         'author_id',
-        // 'category_id',
     ];
 
     protected $casts = [

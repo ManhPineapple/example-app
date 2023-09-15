@@ -45,6 +45,10 @@ class BlogEloquent extends BaseEloquent
     public function updateBlog($id, $data)
     {
         $blog = Blog::find($id);
+        if (isset($data['userId'])) {
+            if ($data['userId'] != $blog->author_id) return false;
+        }
+
         if (isset($data['title'])) {
             $blog->title = $data['title'];
         }
@@ -56,14 +60,14 @@ class BlogEloquent extends BaseEloquent
         return $blog;
     }
 
-    public function deleteBlog($id)
+    public function deleteBlog($id, $userId)
     {
-        $blog = Blog::find($id);
+        if (!$userId) $blog = Blog::find($id); 
+            else $blog = Blog::where('id', $id)->where('author_id', $userId)->first();
         if ($blog) {
             $blog->delete();
             return true;
         }
-
         return false;
     }
 }
